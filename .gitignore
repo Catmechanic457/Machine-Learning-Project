@@ -1,4 +1,4 @@
 **/.vscode
 *.exe
+*.txt
 /data
-todo.txt
