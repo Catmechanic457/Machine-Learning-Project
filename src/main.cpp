@@ -464,21 +464,6 @@ namespace bot {
 
         rs::Position _pos;
         stage::Stage& _stage;
-        
-        protected:
-        Sonar _sonar;
-        MoveType _current_move = FORWARD;
-
-        public:
-
-        Bot(stage::Stage& stage_) :
-            _stage(stage_),
-            _sonar(_pos, stage_)
-        {
-            auto sp = _stage.spawn_point();
-            _pos.position = rs::Vector2<double>(sp.x, sp.y);
-            _pos.rotation = 0;
-        }
 
         rs::Vector2<double> helix(double angle_, double r_) {
             // https://en.wikipedia.org/wiki/Helix
@@ -488,6 +473,10 @@ namespace bot {
             pos.y = r_*(cos(angle_));
             return pos;
         }
+        
+        protected:
+        Sonar _sonar;
+        MoveType _current_move = FORWARD;
 
         void fw(double s_) {
             double const m = 1;
@@ -518,6 +507,17 @@ namespace bot {
             _pos.position.x += v2.x - v1.x;
             _pos.position.y -= v2.y - v1.y;
             _pos.rotation = radians::wrap(angle);
+        }
+
+        public:
+
+        Bot(stage::Stage& stage_) :
+            _stage(stage_),
+            _sonar(_pos, stage_)
+        {
+            auto sp = _stage.spawn_point();
+            _pos.position = rs::Vector2<double>(sp.x, sp.y);
+            _pos.rotation = 0;
         }
         /**
          * \brief Move the bots position.
