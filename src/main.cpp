@@ -6,10 +6,13 @@
 
 #include <SFML/Graphics.hpp>
 
-#include "include\NeuralNetwork.cpp"
-#include "include\PerlinNoise.hpp"
+#include "lib\NeuralNetwork.cpp"
+#include "lib\PerlinNoise.hpp"
 
 #include<windows.h>
+
+#define TEXTURES_PATH "assets/textures/"
+#define FONTS_PATH "assets/fonts/"
 
 const double pi = 3.14159265358979;
 
@@ -208,14 +211,14 @@ namespace stage {
 
         public:
         DisplayedStage(rs::Vector2<unsigned int> win_, sf::RenderWindow& window_) : Stage(win_), _window(window_) {
-            _arial.loadFromFile("assets/fonts/arial.ttf");
+            _arial.loadFromFile(FONTS_PATH "arial.ttf");
         }
         DisplayedStage(unsigned int x_, unsigned int y_, sf::RenderWindow& window_) : Stage(x_, y_), _window(window_) {
-            _arial.loadFromFile("assets/fonts/arial.ttf");
+            _arial.loadFromFile(FONTS_PATH "arial.ttf");
         }
         void render() {
             _t_collision.loadFromImage(collision_boundaries());
-            auto texture_source = possible() ? "assets/textures/stage/stage_possible.png" : "assets/textures/stage/stage_impossible.png";
+            auto texture_source = possible() ? TEXTURES_PATH "stage/possible.png" : TEXTURES_PATH "stage/impossible.png";
             _t_possible.loadFromFile(texture_source);
             //delete(texture_source);
         }
@@ -241,7 +244,7 @@ namespace stage {
                 break;
 
             case SPAWNPOINT :
-                t.loadFromFile("assets/textures/stage/sp_marker.png");
+                t.loadFromFile(TEXTURES_PATH "stage/spawnpoint.png");
                 sprite.setTexture(t);
                 centre(sprite);
                 sprite.setPosition(sf::Vector2f(sp.x, sp.y));
@@ -633,7 +636,7 @@ void draw_stage(sf::RenderWindow& window, stage::DisplayedStage& stage, bot::Dis
 
 int main() {
     nn::Network network({18,4});
-    nn::Storage storage("values/base.json");
+    nn::Storage storage("data/network/base.json");
     storage.read_data();
     auto values = storage.read_values("nn");
     network.load_values(values);
