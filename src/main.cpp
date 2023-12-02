@@ -17,14 +17,32 @@
 const double pi = 3.14159265358979;
 
 namespace radians {
+    /**
+     * \brief Convert from degrees to radians
+     * \param a_ Angle in degrees
+     * \return Angle in radians
+    */
     double from_degrees(double a_) {return ((a_*pi)/180);}
+    /**
+     * \brief Ensures angle is within range 0pi to 2pi
+     * \param a_ Angle
+     * \return Wrapped angle
+    */
     double wrap(double angle) {
         return angle - (2*pi) * floor(angle / (2*pi));
     }
+    /**
+     * \brief Convert from radians to degrees
+     * \param a_ Angle in radians
+     * \return Angle in degrees
+    */
     double to_degrees(double a_) {return (180 * a_)/pi;}
 }
 
 namespace rs {
+    /**
+     * \brief Represents a point in 2D space
+    */
     template <typename T>
     struct Vector2 {
         T x;
@@ -38,6 +56,9 @@ namespace rs {
             y = sin(r_) * d_;
         }
     };
+    /**
+     * \brief Represents a point and rotation in 2D space
+    */
     struct Position {
         Vector2<double> position;
         double rotation;
@@ -48,7 +69,10 @@ namespace rs {
 }
 
 namespace stage {
-
+    /**
+     * \brief An environment with collision areas.
+     * Based on Perlin noise
+    */
     class Stage {
         private:
         rs::Vector2<unsigned int> _win;
@@ -103,6 +127,7 @@ namespace stage {
 
         protected:
         /**
+         * \param pos_ Point
          * \return The amplitude of the noise at the given point
         */
         double value(rs::Vector2<double> pos_) const {
@@ -142,6 +167,7 @@ namespace stage {
         void generate() {_noise = siv::PerlinNoise(seed);}
         /**
          * \brief Check a point lies inside a collision area
+         * \param pos_ The point to check
          * \return `true` if the point is inside a collision area
         */
         bool collision(rs::Vector2<double> pos_) const {
@@ -150,6 +176,7 @@ namespace stage {
             }
         /**
          * \brief Check a point lies inside the stage confines
+         * \param pos_ The point to check
          * \return `true` if the point is inside stage confines
         */
         bool in_bounds(rs::Vector2<double> pos_) const {return (pos_.x >= 0 and pos_.y >= 0 and pos_.x < _win.x and pos_.y < _win.y);}
@@ -169,10 +196,18 @@ namespace stage {
             }
             return possible;
         }
+        /**
+         * \return The stage spawnpoint (located in the centre)
+        */
         rs::Vector2<unsigned int> spawn_point() const {return _sp;}
+        /**
+         * \return The stage size
+        */
         rs::Vector2<unsigned int> window_size() const {return _win;}
     };
-
+    /**
+     * \brief A stage that can be drawn to an sf::RenderWindow
+    */
     class DisplayedStage : public Stage {
         
         private:
@@ -216,6 +251,11 @@ namespace stage {
         DisplayedStage(unsigned int x_, unsigned int y_, sf::RenderWindow& window_) : Stage(x_, y_), _window(window_) {
             _arial.loadFromFile(FONTS_PATH "arial.ttf");
         }
+        /**
+         * \brief Calculate the textures of non-constant sprites.
+         * Should be called when changes have been made to the stage
+         * (such a seed change)
+        */
         void render() {
             _t_collision.loadFromImage(collision_boundaries());
             auto texture_source = possible() ? TEXTURES_PATH "stage/possible.png" : TEXTURES_PATH "stage/impossible.png";
@@ -229,6 +269,10 @@ namespace stage {
             AXIS,
             SEED
         };
+        /**
+         * \brief Draw a poi to the window
+         * \param poi_ The poi to draw
+        */
         void draw(POI poi_) {
             auto win = window_size();
             auto sp = spawn_point();
@@ -290,7 +334,9 @@ namespace stage {
 }
 
 namespace bot {
-
+    /**
+     * \brief A distance and angle
+    */
     struct DataPoint {
         double angle;
         double distance;
@@ -307,6 +353,9 @@ namespace bot {
         LEFT,
         RIGHT
     };
+    /**
+     * \brief A sonar that is attached to a `bot::Bot` object
+    */
     class Sonar {
         private:
         rs::Position& _parent_pos;
@@ -343,7 +392,9 @@ namespace bot {
             _data.resize(_cast_count);
             _data.shrink_to_fit();
         }
-
+        /**
+         * \return The distance reading of the sonar
+        */
         double distance() const {
             rs::Vector2<double> cast;
             auto current = position();
@@ -359,16 +410,23 @@ namespace bot {
                 if (_stage.collision(probe_point) or probe_dist == _max_dist) {return probe_dist;}
             }
         }
-
+        /**
+         * \return `true` if the sonar is at it's last step in the cycle
+        */
         bool at_end() const {
             return (_step == 0 or _step == (_cast_count));
         }
-
+        /**
+         * \brief Can only be called during the last step of the cycle
+         * \return A vector of the data collected during the cycle
+        */
         std::vector<DataPoint> data() const {
             if (!at_end()) {throw std::runtime_error("Data not available");}
             return _data;
         }
-
+        /**
+         * \brief Moves the sonar into the next step of its cycle
+        */
         void step() {
             if (_bounce) {_step--;}
             else {_step++;}
@@ -378,17 +436,25 @@ namespace bot {
             data_index++;
             if (data_index == _cast_count) {data_index = 0;}
         }
-
+        /**
+         * \return The sonar's position
+        */
         rs::Position position() const {
             rs::Position pos = _parent_pos;
             pos.rotation = pos.rotation + rotation();
             return pos;
         }
+        /**
+         * \return The time in seconds that passes after each step of the cycle
+        */
         double gap() {
             return _fov/(_rots*_cast_count);
         }
     };
-
+    /**
+     * \brief A bot.
+     * Has a `bot::Sonar`
+    */
     class Bot {
         private:
 
@@ -453,7 +519,11 @@ namespace bot {
             _pos.position.y -= v2.y - v1.y;
             _pos.rotation = radians::wrap(angle);
         }
-
+        /**
+         * \brief Move the bots position.
+         * Based on a move type and the amount of time passed
+         * \param s_ Time passed in seconds
+        */
         void move(double s_) {
             rs::Position move;
             switch (_current_move)
@@ -467,18 +537,30 @@ namespace bot {
                 break;
             }
         }
-
+        /**
+         * \return The bot's position and rotation
+        */
         rs::Position get_position() {
             return _pos;
         }
-
+        /**
+         * \brief Sets the bots position and rotation
+         * \param pos_ The new position and rotation
+        */
         void set_position(rs::Position pos_) {
             _pos = pos_;
         }
+        /**
+         * \brief Sets the bots position.
+         * Rotation remains unchanged
+         * \param v_ The new position
+        */
         void set_position(rs::Vector2<double> v_) {
             _pos.position = v_;
         }
-
+        /**
+         * \brief Moves the bot and steps the sonar
+        */
         virtual void step() { // Overwritten by Bot_wBrain
             double time_elapsed = _sonar.gap();
             move(time_elapsed);
@@ -489,15 +571,23 @@ namespace bot {
             //cout << "Bot: [" << _pos.position.x << ", " << _pos.position.y << "](" << radians::to_degrees(_pos.rotation) << ")<" << radians::to_degrees(_sonar.position().rotation - _pos.rotation) << ">\n";
             // Nothing more is done as this bot has no "brain"
         }
-
+        /**
+         * \return `true` if the bot is in-bounds
+        */
         bool in_bounds() {
             return _stage.in_bounds(_pos.position);
         }
+        /**
+         * \return `true` if the bot is in a collision area
+        */
         bool collided() {
             return _stage.collision(_pos.position);
         }
     };
-
+    /**
+     * \brief Inherits `bot::Bot`.
+     * Move type is based on the output of a `nn::Network`
+    */
     class Bot_wBrain : public Bot {
         private:
         double data_func(double x_) const {
@@ -537,6 +627,9 @@ namespace bot {
             Bot(stage_),
             _brain(nn_)
         {}
+        /**
+         * \brief Calculates a move. Moves the bot and steps the sonar
+        */
         void step() override {
             if (_sonar.at_end()) {
                 auto data = _sonar.data();
@@ -544,6 +637,9 @@ namespace bot {
             }
             Bot::step(); // Moves the bot to it's next pos, step the sonar
         }
+        /**
+         * \return The `nn::Network` object used for calculating moves
+        */
         nn::Network brain() {
             return _brain;
         }
@@ -572,7 +668,10 @@ namespace bot {
 
             reset_path();
         }
-
+        /**
+         * \brief Moves the bot and steps the sonar.
+         * If `trace_path` is `true`, it will also mark a point along its path
+        */
         void step() override {
             Bot_wBrain::step();
             if (_trace_path) {
@@ -584,28 +683,46 @@ namespace bot {
                 }
             }
         }
-
+        /**
+         * \brief Draws the bot
+        */
         void draw_bot() {
             rs::Position bot_pos = get_position();
             _s_bot.setPosition(sf::Vector2f(bot_pos.position.x,bot_pos.position.y));
             _s_bot.setRotation(radians::to_degrees(bot_pos.rotation));
             _window.draw(_s_bot);
         }
+        /**
+         * \brief Draws the sonar
+        */
         void draw_sonar() {
             rs::Position sonar_pos = _sonar.position();
             _s_sonar.setPosition(sf::Vector2f(sonar_pos.position.x,sonar_pos.position.y));
             _s_sonar.setRotation(radians::to_degrees(sonar_pos.rotation));
             _window.draw(_s_sonar);
         }
+        /**
+         * \brief Draws the bot and sonar
+        */
         void draw() {
             draw_bot();
             draw_sonar();
         }
+        /**
+         * \brief If `true`, the bot will mark its journey
+         * \param enable_
+        */
         void trace_path(bool enable_) {_trace_path = enable_;}
+        /**
+         * \brief Clears the traced path
+        */
         void reset_path() {
             auto win = _window.getSize();
             _path.create(win.x, win.y, sf::Color::Transparent);
         }
+        /**
+         * \brief Draws the traced path
+        */
         void draw_path() {
             if (not _trace_path) {return;}
             sf::Texture t;
