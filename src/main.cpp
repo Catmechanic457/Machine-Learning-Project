@@ -450,6 +450,18 @@ namespace bot {
         double gap() {
             return _fov/(_rots*_cast_count);
         }
+        /**
+         * \return The fov
+        */
+        double fov() {
+            return _fov;
+        }
+        /**
+         * \return The maximum distance that can be measured
+        */
+        double range() {
+            return _max_dist;    
+        }
     };
     /**
      * \brief A bot.
@@ -730,6 +742,23 @@ namespace bot {
             sf::Sprite s(t);
             _window.draw(s);
         }
+        void draw_fov() {
+            rs::Position bot_pos = get_position();
+            double fov = _sonar.fov();
+            sf::ConvexShape fov_area;
+            const int point_count = 33;
+            fov_area.setPointCount(point_count);
+            fov_area.setPoint(0,sf::Vector2f(bot_pos.position.x, bot_pos.position.y));
+            double range = _sonar.range();
+            for (unsigned int i = 1; i < point_count; i++) {
+                double angle = bot_pos.rotation - (fov/2.0) + ((fov*(i-1))/(point_count-2));
+                rs::Vector2<float> v;
+                v.from_bearing(range, angle);
+                fov_area.setPoint(i, sf::Vector2f(bot_pos.position.x + v.x, bot_pos.position.y + v.y));
+            }
+            fov_area.setFillColor(sf::Color(255,255,0,100));
+            _window.draw(fov_area);
+        }
     };
 }
 
@@ -739,6 +768,7 @@ void draw_stage(sf::RenderWindow& window, stage::DisplayedStage& stage, bot::Dis
     stage.draw(stage::DisplayedStage::SPAWNPOINT);
     bot.draw_path();
     bot.draw_bot();
+    bot.draw_fov();
 
     sf::Font arial;
     arial.loadFromFile("assets/fonts/arial.ttf");
