@@ -1,5 +1,6 @@
 **/.vscode
 *.exe
 *.txt
+*.bat
 *test*
 /data/stage/lookup.json
