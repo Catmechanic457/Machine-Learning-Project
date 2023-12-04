@@ -6,8 +6,8 @@
 
 #include <SFML/Graphics.hpp>
 
-#include "lib\NeuralNetwork.cpp"
-#include "lib\PerlinNoise.hpp"
+#include "lib/NeuralNetwork.cpp"
+#include "lib/PerlinNoise.hpp"
 
 #include<windows.h>
 
@@ -191,7 +191,7 @@ namespace stage {
             try {
                 possible = cast(_sp, cast_count, iteration);
             }
-            catch (std::runtime_error) {
+            catch (std::runtime_error const&) {
                 possible = false;
             }
             return possible;
@@ -231,8 +231,8 @@ namespace stage {
             sf::Image image;
             auto win = window_size();
             image.create(win.x, win.y, sf::Color::White);
-            for (int x = 0; x < win.x; x++) {
-                for (int y = 0; y < win.y; y++) {
+            for (unsigned int x = 0; x < win.x; x++) {
+                for (unsigned int y = 0; y < win.y; y++) {
                     unsigned int pv = 255;
                     rs::Vector2<double> point(x,y);
                     if (collision(point)) {
@@ -273,7 +273,7 @@ namespace stage {
          * \brief Draw a poi to the window
          * \param poi_ The poi to draw
         */
-        void draw(POI poi_) {
+        void draw(POI poi_) const {
             auto win = window_size();
             auto sp = spawn_point();
 
@@ -367,7 +367,7 @@ namespace bot {
         const double _fov = pi;
         const double _max_dist = 100.0;
         
-        int _step = 0;
+        unsigned int _step = 0;
         bool _bounce = false;
 
         unsigned int data_index = 0;
@@ -387,8 +387,8 @@ namespace bot {
         public:
         Sonar(rs::Position& parent_pos_, stage::Stage& stage_) :
         _parent_pos(parent_pos_),
-        _data(_cast_count),
-        _stage(stage_) {
+        _stage(stage_),
+        _data(_cast_count) {
             _data.resize(_cast_count);
             _data.shrink_to_fit();
         }
@@ -447,19 +447,19 @@ namespace bot {
         /**
          * \return The time in seconds that passes after each step of the cycle
         */
-        double gap() {
+        double gap() const {
             return _fov/(_rots*_cast_count);
         }
         /**
          * \return The fov
         */
-        double fov() {
+        double fov() const {
             return _fov;
         }
         /**
          * \return The maximum distance that can be measured
         */
-        double range() {
+        double range() const {
             return _max_dist;    
         }
     };
@@ -470,14 +470,13 @@ namespace bot {
     class Bot {
         private:
 
-        double _pxs = 5.0; // Movement speed in pixels/s
-        double _spc; // (Seconds per Cycle) How much time has "passed" between each cycle;
+        const double _pxs = 5.0; // Movement speed in pixels/s
         const double _turn_r = 15;
 
         rs::Position _pos;
         stage::Stage& _stage;
 
-        rs::Vector2<double> helix(double angle_, double r_) {
+        rs::Vector2<double> helix(double angle_, double r_) const {
             // https://en.wikipedia.org/wiki/Helix
             // adapted from (cos(t), sin(t))
             rs::Vector2<double> pos;
@@ -552,7 +551,7 @@ namespace bot {
         /**
          * \return The bot's position and rotation
         */
-        rs::Position get_position() {
+        rs::Position get_position() const {
             return _pos;
         }
         /**
@@ -578,21 +577,18 @@ namespace bot {
             move(time_elapsed);
             _sonar.step();
 
-            //cout << "Move Type: " << _current_move << endl;
-
-            //cout << "Bot: [" << _pos.position.x << ", " << _pos.position.y << "](" << radians::to_degrees(_pos.rotation) << ")<" << radians::to_degrees(_sonar.position().rotation - _pos.rotation) << ">\n";
             // Nothing more is done as this bot has no "brain"
         }
         /**
          * \return `true` if the bot is in-bounds
         */
-        bool in_bounds() {
+        bool in_bounds() const {
             return _stage.in_bounds(_pos.position);
         }
         /**
          * \return `true` if the bot is in a collision area
         */
-        bool collided() {
+        bool collided() const {
             return _stage.collision(_pos.position);
         }
     };
@@ -611,7 +607,7 @@ namespace bot {
         }
 
         nn::Network _brain;
-        bot::MoveType calc_move(std::vector<DataPoint> data_) {
+        bot::MoveType calc_move(std::vector<DataPoint> data_) const {
             std::sort(
                 data_.begin(), data_.end(),
                 [] (const DataPoint &a, const DataPoint &b)
@@ -652,7 +648,7 @@ namespace bot {
         /**
          * \return The `nn::Network` object used for calculating moves
         */
-        nn::Network brain() {
+        nn::Network brain() const {
             return _brain;
         }
     };
@@ -688,8 +684,6 @@ namespace bot {
             Bot_wBrain::step();
             if (_trace_path) {
                 auto pos = get_position().position;
-                auto win = _window.getSize();
-                //_path.setPixel(std::clamp<int>(pos.x, 0, win.x - 1), std::clamp<int>(pos.y, 0, win.y - 1), sf::Color(0,255,255,255));
                 if (in_bounds()) {
                     _path.setPixel(pos.x, pos.y, sf::Color(0,255,255,255));
                 }
@@ -735,14 +729,14 @@ namespace bot {
         /**
          * \brief Draws the traced path
         */
-        void draw_path() {
+        void draw_path() const {
             if (not _trace_path) {return;}
             sf::Texture t;
             t.loadFromImage(_path);
             sf::Sprite s(t);
             _window.draw(s);
         }
-        void draw_fov() {
+        void draw_fov() const {
             rs::Position bot_pos = get_position();
             double fov = _sonar.fov();
             sf::ConvexShape fov_area;

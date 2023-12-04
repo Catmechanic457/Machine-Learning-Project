@@ -19,7 +19,7 @@ namespace jcv {
     vector<T> to_vector(Json::Value i_) {
         T size = i_.size();
         vector<T> v(size);
-        for (int i = 0; i < size; i++) {
+        for (unsigned int i = 0; i < size; i++) {
             v[i] = i_[i].as<T>();
         }
         return v;
@@ -33,7 +33,7 @@ namespace jcv {
     */
     Json::Value from_vector(vector<T> i_) {
         Json::Value j;
-        for (int i : i_) {
+        for (unsigned int i : i_) {
             j.append(i);
         }
         return j;
@@ -45,7 +45,7 @@ namespace nn {
     class Values {
 
         public:
-        vector<int> shape;
+        vector<unsigned int> shape;
         vector<double> weights;
         vector<double> bias;
     };
@@ -53,9 +53,9 @@ namespace nn {
     class Network {
 
         private:
-        int w_index(int l_, int n_, int w_) const {
-            int index = 0;
-            for (int i = 0; i < l_; i++) {
+        unsigned int w_index(unsigned int l_, unsigned int n_, unsigned int w_) const {
+            unsigned int index = 0;
+            for (unsigned int i = 0; i < l_; i++) {
                 index += _values.shape[i] * _values.shape[i+1];
             }
             index += n_ * _values.shape[l_ + 1];
@@ -63,9 +63,9 @@ namespace nn {
             return index;
         }
 
-        int b_index(int l_, int n_) const {
-            int index = 0;
-            for (int i = 0; i < l_; i++) {
+        unsigned int b_index(unsigned int l_, unsigned int n_) const {
+            unsigned int index = 0;
+            for (unsigned int i = 0; i < l_; i++) {
                 index += _values.shape[i];
             }
             index += n_;
@@ -94,27 +94,27 @@ namespace nn {
             return value_ + bias_;
         }
 
-        int _w_size;
-        int _b_size;
-        int _layers;
+        unsigned int _w_size;
+        unsigned int _b_size;
+        unsigned int _layers;
 
         Values _values;
 
         public:
-        Network(vector<int> __s) {
+        Network(vector<unsigned int> s_) {
             // Store shape
-            _values.shape = __s;
+            _values.shape = s_;
             _layers = _values.shape.size();
 
             // Calculate number of weights
             _w_size = 0;
-            for (int i = 0; i < _values.shape.size() - 1; i++) {
+            for (unsigned int i = 0; i < _values.shape.size() - 1; i++) {
                 _w_size += _values.shape[i] * _values.shape[i+1];
             }
 
             // Calculate number of bias
             _b_size = 0;
-            for (int i = 0; i < _values.shape.size(); i++) {
+            for (unsigned int i = 0; i < _values.shape.size(); i++) {
                 _b_size += _values.shape[i];
             }
 
@@ -134,7 +134,7 @@ namespace nn {
          * Index `0` denotes the input layer
          * \return The shape as a vector
         */
-        vector<int> shape() const {return _values.shape;}
+        vector<unsigned int> shape() const {return _values.shape;}
         /**
          * \brief The bias of each node in each layer
          * \return The bias as a vector
@@ -175,16 +175,16 @@ namespace nn {
         vector<double> calculate(vector<double> input_) const {
             vector<double> l_inputs = input_;
             vector<double> l_outputs;
-            for (int l = 1; l < _layers; l++) {
+            for (unsigned int l = 1; l < _layers; l++) {
                 // For every layer (excluding input layer)
                 l_outputs.resize(_values.shape[l]);
-                for (int n = 0; n < _values.shape[l]; n++) {
+                for (unsigned int n = 0; n < _values.shape[l]; n++) {
                     // For every node in current layer
                     double n_output = 0.0;
                     double n_bias = _values.bias[b_index(l, n)];
-                    for (int np = 0; np < _values.shape[l-1]; np++) {
+                    for (unsigned int np = 0; np < _values.shape[l-1]; np++) {
                         // For node in previous layer
-                        int index = w_index(l-1, np, n);
+                        unsigned int index = w_index(l-1, np, n);
                         double weight = _values.weights[index]; // Get weight of node
                         double weighted_input = l_inputs[np] * weight;
                         n_output += weighted_input;
@@ -245,7 +245,7 @@ namespace nn {
         */
         Values read_values(string id_) const {
             Json::Value network = data[id_];
-            vector<int> shape = jcv::to_vector<int>(network["shape"]); shape.shrink_to_fit();
+            vector<unsigned int> shape = jcv::to_vector<unsigned int>(network["shape"]); shape.shrink_to_fit();
             vector<double> bias = jcv::to_vector<double>(network["bias"]); bias.shrink_to_fit();
             vector<double> weights = jcv::to_vector<double>(network["weights"]); weights.shrink_to_fit();
             Values values;
@@ -260,7 +260,7 @@ namespace nn {
          * `write_data()` must be called to update the file
         */
         void load_values(Values n_, string id_) {
-            data[id_]["shape"] = jcv::from_vector<int>(n_.shape);
+            data[id_]["shape"] = jcv::from_vector<unsigned int>(n_.shape);
             data[id_]["bias"] = jcv::from_vector<double>(n_.bias);
             data[id_]["weights"] = jcv::from_vector<double>(n_.weights);
         }
@@ -291,23 +291,23 @@ namespace nn {
             sf::Event event;
             window.clear(sf::Color::White);
 
-            int layer_count = n_.shape.size();
-            int node_r = 5;
+            unsigned int layer_count = n_.shape.size();
+            unsigned int node_r = 5;
 
             sf::CircleShape node(node_r);
             sf::VertexArray weight(sf::Lines, 2);
             unsigned int bias_index = 0;
             unsigned int weights_index = 0;
-            for (int l = 0; l < layer_count; l++) {
-                int node_count = n_.shape[l];
-                int nx = ((l + 1)*_winx) / (layer_count + 1);
-                for (int n = 0; n < node_count; n++) {
-                    int ny = ((n + 1)*_winy) / (node_count + 1);
+            for (unsigned int l = 0; l < layer_count; l++) {
+                unsigned int node_count = n_.shape[l];
+                unsigned int nx = ((l + 1)*_winx) / (layer_count + 1);
+                for (unsigned int n = 0; n < node_count; n++) {
+                    unsigned int ny = ((n + 1)*_winy) / (node_count + 1);
                     weight[0].position = sf::Vector2f(nx,ny);
                     if (l < (layer_count - 1)) {
-                        int n2x = ((l + 2)*_winx) / (layer_count + 1);
+                        unsigned int n2x = ((l + 2)*_winx) / (layer_count + 1);
                         for (unsigned int w = 0; w < n_.shape[l+1]; w++) {
-                            int n2y = ((w + 1)*_winy) / (n_.shape[l+1] + 1);
+                            unsigned int n2y = ((w + 1)*_winy) / (n_.shape[l+1] + 1);
                             weight[1].position = sf::Vector2f(n2x, n2y);
 
                             double s = sig(n_.weights[weights_index]);
