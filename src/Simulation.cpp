@@ -11,8 +11,8 @@
 
 #include<windows.h>
 
-#define TEXTURES_PATH "assets/textures/"
-#define FONTS_PATH "assets/fonts/"
+#define TEXTURES_PATH "../assets/textures/"
+#define FONTS_PATH "../assets/fonts/"
 
 const double pi = 3.14159265358979;
 
@@ -669,8 +669,8 @@ namespace bot {
 
         public:
         DisplayedBot(stage::Stage& stage_, nn::Network n_, sf::RenderWindow& window_) : Bot_wBrain(stage_, n_), _window(window_) {
-            _t_bot.loadFromFile("assets/textures/bot/body.png");
-            _t_sonar.loadFromFile("assets/textures/bot/sonar.png");
+            _t_bot.loadFromFile(TEXTURES_PATH "bot/body.png");
+            _t_sonar.loadFromFile(TEXTURES_PATH "bot/sonar.png");
             auto bts = _t_bot.getSize();
             auto sts = _t_sonar.getSize();
             _s_bot.setTexture(_t_bot);
