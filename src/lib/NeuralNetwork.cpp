@@ -222,9 +222,8 @@ namespace nn {
                 values_file >> data;
             }
             else {
-                cout << "No file found. New file created.\n";
-                data = {};
-                write_data();
+                std::cout << "Cannot locate: " << directory << std::endl;
+                throw std::runtime_error("File or directory does not exist");
             }
             values_file.close();
         }
