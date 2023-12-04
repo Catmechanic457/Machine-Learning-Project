@@ -6,7 +6,6 @@
 #include <fstream>
 #include <json/json.h>
 #include <SFML/Graphics.hpp>
-#include <SFML/System.hpp>
 
 namespace jcv {
     using namespace std;
@@ -299,13 +298,10 @@ namespace nn {
          * \brief Display `nn::Values` in a window
          * \param n_ Values to display
         */
-        void plot_network(Network& n_) const {
+        sf::Texture plot_network(Network& n_) const {
 
-            sf::RenderWindow window(sf::VideoMode(_winx, _winy), _title, sf::Style::Close);
-
-            
-            sf::Event event;
-            window.clear(sf::Color::White);
+            sf::RenderTexture texture;
+            texture.create(_winx, _winy);
 
             auto shape = n_.shape();
             auto weights = n_.weights();
@@ -335,24 +331,18 @@ namespace nn {
                             weight[1].color = sf::Color(255*s, 255*-s, 255, 255);
 
 
-                            window.draw(weight);
+                            texture.draw(weight);
                             weights_index++;
                         }
                     }
                     double s = sig(bias[bias_index]);
                     node.setFillColor(sf::Color(255, 255*s, 255*(1-s), 255));
                     node.setPosition(nx - node_r, ny - node_r);
-                    window.draw(node);
+                    texture.draw(node);
                     bias_index++;
                 }
             }
-            window.display();
-            while (window.isOpen()) {
-                while (window.pollEvent(event)) {
-                    if (event.type == sf::Event::Closed)
-                        window.close();
-                }
-            }
+            return texture.getTexture();
         }
     };
 }
