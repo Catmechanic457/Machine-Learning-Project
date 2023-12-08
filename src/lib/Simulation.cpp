@@ -8,11 +8,9 @@
 
 #include "NeuralNetwork.cpp"
 #include "PerlinNoise.hpp"
+#include "Assets.cpp"
 
 #include<windows.h>
-
-#define TEXTURES_PATH "../assets/textures/"
-#define FONTS_PATH "../assets/fonts/"
 
 const double pi = 3.14159265358979;
 
@@ -69,6 +67,7 @@ namespace rs {
 }
 
 namespace stage {
+    using namespace assets::textures::stage;
     /**
      * \brief An environment with collision areas.
      * Based on Perlin noise
@@ -209,9 +208,7 @@ namespace stage {
      * \brief A stage that can be drawn to an sf::RenderWindow
     */
     class DisplayedStage : public Stage {
-        
         private:
-        sf::Font _arial;
         sf::Texture _t_collision;
         sf::Texture _t_possible;
         sf::RenderWindow& _window;
@@ -245,12 +242,8 @@ namespace stage {
         }
 
         public:
-        DisplayedStage(rs::Vector2<unsigned int> win_, sf::RenderWindow& window_) : Stage(win_), _window(window_) {
-            _arial.loadFromFile(FONTS_PATH "arial.ttf");
-        }
-        DisplayedStage(unsigned int x_, unsigned int y_, sf::RenderWindow& window_) : Stage(x_, y_), _window(window_) {
-            _arial.loadFromFile(FONTS_PATH "arial.ttf");
-        }
+        DisplayedStage(rs::Vector2<unsigned int> win_, sf::RenderWindow& window_) : Stage(win_), _window(window_) {}
+        DisplayedStage(unsigned int x_, unsigned int y_, sf::RenderWindow& window_) : Stage(x_, y_), _window(window_) {}
         /**
          * \brief Calculate the textures of non-constant sprites.
          * Should be called when changes have been made to the stage
@@ -258,9 +251,7 @@ namespace stage {
         */
         void render() {
             _t_collision.loadFromImage(collision_boundaries());
-            auto texture_source = possible() ? TEXTURES_PATH "stage/possible.png" : TEXTURES_PATH "stage/impossible.png";
-            _t_possible.loadFromFile(texture_source);
-            //delete(texture_source);
+            _t_possible = possible() ? evaluation::possible : evaluation::possible;
         }
         enum POI {
             COLLISION,
@@ -288,8 +279,7 @@ namespace stage {
                 break;
 
             case SPAWNPOINT :
-                t.loadFromFile(TEXTURES_PATH "stage/spawnpoint.png");
-                sprite.setTexture(t);
+                sprite.setTexture(spawnpoint);
                 centre(sprite);
                 sprite.setPosition(sf::Vector2f(sp.x, sp.y));
                 _window.draw(sprite);
@@ -302,7 +292,7 @@ namespace stage {
                 break;
 
             case AXIS :
-                text.setFont(_arial);
+                text.setFont(assets::fonts::arial);
                 text.setCharacterSize(16);
 
                 text.setString("x");
@@ -317,7 +307,7 @@ namespace stage {
                 break;
             
             case SEED :
-                text.setFont(_arial);
+                text.setFont(assets::fonts::arial);
                 text.setCharacterSize(16);
                 text.setString("Seed: " + std::to_string(seed));
                 text.setFillColor(sf::Color(10,10,10,255));
@@ -334,6 +324,7 @@ namespace stage {
 }
 
 namespace bot {
+    using namespace assets::textures::bot;
     /**
      * \brief A distance and angle
     */
@@ -656,8 +647,6 @@ namespace bot {
         private:
         sf::Sprite _s_bot;
         sf::Sprite _s_sonar;
-        sf::Texture _t_bot;
-        sf::Texture _t_sonar;
         sf::RenderWindow& _window;
         sf::Image _path;
 
@@ -665,12 +654,10 @@ namespace bot {
 
         public:
         DisplayedBot(stage::Stage& stage_, nn::Network n_, sf::RenderWindow& window_) : Bot_wBrain(stage_, n_), _window(window_) {
-            _t_bot.loadFromFile(TEXTURES_PATH "bot/body.png");
-            _t_sonar.loadFromFile(TEXTURES_PATH "bot/sonar.png");
-            auto bts = _t_bot.getSize();
-            auto sts = _t_sonar.getSize();
-            _s_bot.setTexture(_t_bot);
-            _s_sonar.setTexture(_t_sonar);
+            auto bts = sonar.getSize();
+            auto sts = body.getSize();
+            _s_bot.setTexture(body);
+            _s_sonar.setTexture(sonar);
             _s_bot.setOrigin(sf::Vector2f((bts.x/2),(bts.y/2)));
             _s_sonar.setOrigin(sf::Vector2f((sts.x/2),(sts.y/2)));
 
