@@ -23,8 +23,8 @@ int main() {
     Network network(values.shape);
     network.load_values(values);
 
-    Display display(1500,1500);
-    sf::RenderWindow window(sf::VideoMode(1500,1500), "Network", sf::Style::Close);
+    sf::RenderWindow window(sf::VideoMode(1000,1000), "Network", sf::Style::Close);
+    Display display(window.getSize().x, window.getSize().y);
     sf::Texture t = display.plot_network(network);
     sf::Sprite s(t);
     window.draw(s);
