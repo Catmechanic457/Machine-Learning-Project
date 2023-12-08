@@ -4,4 +4,5 @@
 *.txt
 *.bat
 *test*
+!pcmp*
 /data/stage/lookup.json
