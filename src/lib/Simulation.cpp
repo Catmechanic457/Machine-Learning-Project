@@ -6,8 +6,8 @@
 
 #include <SFML/Graphics.hpp>
 
-#include "lib/NeuralNetwork.cpp"
-#include "lib/PerlinNoise.hpp"
+#include "NeuralNetwork.cpp"
+#include "PerlinNoise.hpp"
 
 #include<windows.h>
 
