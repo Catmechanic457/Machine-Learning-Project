@@ -284,8 +284,8 @@ namespace nn {
 
         private:
         string _title = "Network";
-        unsigned int _winx = 1000;
-        unsigned int _winy = 1000;
+        unsigned int _winx;
+        unsigned int _winy;
         
         double sig(double x_) const {
             const double _e = 2.71828;
@@ -294,6 +294,8 @@ namespace nn {
         }
         
         public:
+        Display() : _winx(1000), _winy(1000) {}
+        Display(unsigned int winx_, unsigned int winy_) : _winx(winx_), _winy(winy_) {}
         /**
          * \brief Display `nn::Values` in a window
          * \param n_ Values to display
