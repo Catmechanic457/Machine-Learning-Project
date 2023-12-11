@@ -1,3 +1,7 @@
+#ifndef NEURALNETWORK_H
+#define NEURALNETWORK_H
+
+
 #include <iostream>
 #include <string>
 #include <vector>
@@ -348,3 +352,5 @@ namespace nn {
         }
     };
 }
+
+#endif

@@ -1,3 +1,5 @@
+#ifndef SIMULATION_H
+#define SIMULATION_H
 
 #include <vector>
 #include <iostream>
@@ -6,9 +8,9 @@
 
 #include <SFML/Graphics.hpp>
 
-#include "NeuralNetwork.cpp"
+#include "NeuralNetwork.hpp"
 #include "PerlinNoise.hpp"
-#include "Assets.cpp"
+#include "Assets.hpp"
 
 #include<windows.h>
 
@@ -742,3 +744,5 @@ namespace bot {
         }
     };
 }
+
+#endif

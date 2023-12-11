@@ -1,7 +1,10 @@
+#ifndef INTERACTABLES_H
+#define INTERACTABLES_H
+
 #include <SFML/Graphics.hpp>
 #include <vector>
 #include <string.h>
-#include "Assets.cpp"
+#include "Assets.hpp"
 
 namespace gui {
     using namespace assets::textures::gui;
@@ -373,3 +376,5 @@ namespace gui {
         }
     };
 }
+
+#endif

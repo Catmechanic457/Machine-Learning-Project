@@ -1,3 +1,6 @@
+#ifndef ASSETS_H
+#define ASSETS_H
+
 #include <SFML/Graphics.hpp>
 #include <iostream>
 
@@ -84,3 +87,5 @@ namespace assets {
         std::cout << "Complete." << std::endl;
     }
 }
+
+#endif

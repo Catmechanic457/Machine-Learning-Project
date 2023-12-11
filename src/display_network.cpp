@@ -1,4 +1,4 @@
-#include "lib/NeuralNetwork.cpp"
+#include "lib/NeuralNetwork.hpp"
 #include <iostream>
 #include <string.h>
 
