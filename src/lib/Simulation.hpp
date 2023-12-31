@@ -142,8 +142,8 @@ namespace stage {
         */
         double value(rs::Vector2<double> pos_, double f_, unsigned int o_) const {
             const unsigned int s = _win.x < _win.y ? _win.x : _win.y; // Use the smaller value
-            const double fx = f_/_win.x;
-            const double fy = f_/_win.y;
+            const double fx = f_/s;
+            const double fy = f_/s;
             return _noise.octave2D_01(pos_.x * fx, pos_.y * fy, o_);
         }
 
