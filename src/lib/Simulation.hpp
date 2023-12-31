@@ -132,9 +132,19 @@ namespace stage {
          * \return The amplitude of the noise at the given point
         */
         double value(rs::Vector2<double> pos_) const {
-            const double fx = _frequency/_win.x;
-            const double fy = _frequency/_win.y;
-            return _noise.octave2D_01(pos_.x * fx, pos_.y * fy, _octaves);
+            return value(pos_, _frequency, _octaves);
+        }
+        /**
+         * \param pos_ Point
+         * \param f_ Frequency to use
+         * \param o_ Number of octaves to use
+         * \return The amplitude of the noise at the given point
+        */
+        double value(rs::Vector2<double> pos_, double f_, unsigned int o_) const {
+            const unsigned int s = _win.x < _win.y ? _win.x : _win.y; // Use the smaller value
+            const double fx = f_/_win.x;
+            const double fy = f_/_win.y;
+            return _noise.octave2D_01(pos_.x * fx, pos_.y * fy, o_);
         }
 
         public:
@@ -149,19 +159,23 @@ namespace stage {
          * Defaults to `2`
          * \param o_ New octave value
         */
-        void octaves(unsigned int o_) {_octaves = std::clamp<unsigned int>(o_, 1, 16);}
+        void set_octaves(unsigned int o_) {_octaves = std::clamp<unsigned int>(o_, 1, 16);}
         /**
          * \brief Set the frequency of the noise.
          * Defaults to `4.0`
          * \param f_ New frequency value
         */
-        void frequency(double f_) {_frequency = std::clamp<double>(f_, 0.1, 64.0);}
+        void set_frequency(double f_) {_frequency = std::clamp<double>(f_, 0.1, 64.0);}
         /**
          * \brief Set the threshold ("height" value) used for the map.
          * Defaults to `0.6`
          * \param t_ New threshold value
         */
-        void threshold(double t_) {_threshold = std::clamp<double>(t_, 0.0, 1.0);}
+        void set_threshold(double t_) {_threshold = std::clamp<double>(t_, 0.0, 1.0);}
+        /**
+         * \returns The threshold value for collisions
+        */
+        double get_threshold() {return _threshold;}
         /**
          * \brief Generate new noise
         */
@@ -584,6 +598,7 @@ namespace bot {
         bool collided() const {
             return _stage.collision(_pos.position);
         }
+        stage::Stage& stage() {return _stage;}
     };
     /**
      * \brief Inherits `bot::Bot`.
