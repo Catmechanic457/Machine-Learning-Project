@@ -94,7 +94,7 @@ namespace gui {
         {}
 
         void move(Interactable* interactable) {
-            // Remove iteractable from old cells
+            // Remove interactable from old cells
             for (auto index : interactable->cell_index) {
                 auto& cell_members = _cells[index].members;
                 for (unsigned int i = 0; i < cell_members.size(); i++) {
@@ -102,7 +102,7 @@ namespace gui {
                     if (cell_members[i] == interactable) {
                         cell_members.erase(cell_members.begin()+i);
                         // break; could be added here, but could cause issues
-                        // if the same obj apears multiple times
+                        // if the same obj appears multiple times
                     }
                 }
             }
@@ -129,12 +129,12 @@ namespace gui {
         }
 
         void handle(sf::Event event, sf::Vector2i mouse_pos) {
-            // Actions carried out by the foucsed cell member
+            // Actions carried out by the focused cell member
             // (where the mouse is within their bounding box)
             std::vector<Interactable::Action> focused_actions;
 
             // Actions carried out by non-focused members
-            // These ramain constant
+            // These remain constant
             std::vector<Interactable::Action> unfocused_actions {
                 Interactable::OUTSIDE_BOUNDS
             };
@@ -170,7 +170,7 @@ namespace gui {
     };
 
     /**
-     * \brief Sets the Sprite's position and moves it to the corrosponding cell
+     * \brief Sets the Sprite's position and moves it to the corrsponding cell
      * \param pos_ New position
      * \param cell_grid_ Cell grid to be repositioned in
     */
@@ -213,7 +213,7 @@ namespace gui {
             t.draw(rail_right);
             t.display();
 
-            // Texture needs to be available to refrance when drawn
+            // Texture needs to be available to reference when drawn
             _rail_sized = t.getTexture();
         }
 
@@ -343,7 +343,7 @@ namespace gui {
             rail_right.setPosition(sf::Vector2f(unit_size.x*(_width_units-1), 0));
             t.draw(rail_right);
             t.display();
-            // Texture needs to be available to refrance when drawn
+            // Texture needs to be available to reference when drawn
             _t_box_sized = t.getTexture();
             setTexture(_t_box_sized);
         }
