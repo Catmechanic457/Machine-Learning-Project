@@ -261,6 +261,14 @@ namespace gui {
          * \return The slider's handle to be drawn to a window
         */
         const sf::Sprite& handle() {return _handle;}
+        /**
+         * \return The slider's minimum value
+        */
+        const T& get_min() {return _min;}
+        /**
+         * \return The slider's maximum value
+        */
+        const T& get_max() {return _max;}
     };
 
     class CheckBox : public Interactable {
@@ -374,6 +382,60 @@ namespace gui {
             _text = text_;
             load_text();
         }
+    };
+
+    class ProgressBar : public sf::Sprite {
+        public:
+        enum State {NORMAL,SUCCESS,FAIL};
+
+        private:
+        double _progress;
+        sf::Texture _texture;
+
+        State _state = NORMAL;
+
+        public:
+
+        ProgressBar() : Sprite(), _progress(0.0) {
+            render();
+        }
+
+        void render() {
+            auto texture_size = progress_bar::empty.getSize();
+            unsigned int progress_pixels = _progress * texture_size.x;
+
+            sf::Texture fill_texture;
+            switch (_state)
+            {
+            case NORMAL:
+                fill_texture = progress_bar::filled;
+                break;
+            case SUCCESS:
+                fill_texture = progress_bar::success;
+                break;
+            case FAIL:
+                fill_texture = progress_bar::failed;
+                break;
+            default:
+                break;
+            }
+
+            sf::Sprite empty(progress_bar::empty);
+            sf::Sprite filled(fill_texture, sf::IntRect(sf::Vector2i(0,0), sf::Vector2i(progress_pixels, texture_size.y)));
+            sf::RenderTexture t;
+            t.create(texture_size.x, texture_size.y);
+
+            t.draw(empty);
+            t.draw(filled);
+            t.display();
+            _texture = t.getTexture();
+            setTexture(_texture);
+        }
+
+        void set_progress(double p_) {_progress = std::clamp(p_, 0.0, 1.0);}
+        double get_progress() {return _progress;}
+        void set_state(State s_) {_state = s_;}
+        State get_state() {return _state;}
     };
 }
 

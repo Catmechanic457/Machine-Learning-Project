@@ -41,6 +41,12 @@ namespace assets {
                 Texture centre;
                 Texture right;
             }
+            namespace progress_bar {
+                Texture empty;
+                Texture filled;
+                Texture success;
+                Texture failed;
+            }
         }
     }
 
@@ -77,6 +83,11 @@ namespace assets {
         success = success and textures::gui::text_box::left.loadFromFile(TEXTURES_PATH "gui/text_box_l.png");
         success = success and textures::gui::text_box::centre.loadFromFile(TEXTURES_PATH "gui/text_box.png");
         success = success and textures::gui::text_box::right.loadFromFile(TEXTURES_PATH "gui/text_box_r.png");
+
+        success = success and textures::gui::progress_bar::empty.loadFromFile(TEXTURES_PATH "gui/progress_bar_empty.png");
+        success = success and textures::gui::progress_bar::filled.loadFromFile(TEXTURES_PATH "gui/progress_bar_filled.png");
+        success = success and textures::gui::progress_bar::success.loadFromFile(TEXTURES_PATH "gui/progress_bar_success.png");
+        success = success and textures::gui::progress_bar::failed.loadFromFile(TEXTURES_PATH "gui/progress_bar_failed.png");
 
 
         success = success and fonts::arial.loadFromFile(FONTS_PATH "arial.ttf");
