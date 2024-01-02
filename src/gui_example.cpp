@@ -6,7 +6,7 @@ int main() {
     assets::load_assets();
 
     // Create window
-    sf::RenderWindow window(sf::VideoMode(500,500), "GUI Test", sf::Style::Close);
+    sf::RenderWindow window(sf::VideoMode(1000,1000), "GUI Test", sf::Style::Close);
     // Create cell grid with the same size
     CellGrid cell_grid(window.getSize().x, window.getSize().y, 32);
 
@@ -20,6 +20,9 @@ int main() {
     CheckBox check_box;
     TextBox check_box_label(4);
 
+    ProgressBar loading_bar;
+    loading_bar.set_progress(0);
+
     // Set positions
     slider.setPosition(sf::Vector2f(128,32), cell_grid);
     slider_label.setPosition(sf::Vector2f(0,32));
@@ -29,6 +32,8 @@ int main() {
 
     check_box.setPosition(sf::Vector2f(128,96), cell_grid);
     check_box_label.setPosition(sf::Vector2f(0,96));
+
+    loading_bar.setPosition(0, 128);
 
     sf::Vector2i mouse_pos;
     while (window.isOpen()) {
@@ -68,6 +73,17 @@ int main() {
 
         window.draw(check_box_label);
         window.draw(check_box);
+
+        double progress = (slider.value - slider.get_min()) / static_cast<double>(slider.get_max());
+        if (progress == 1.0) {
+            std::cout << progress << std::endl;
+            loading_bar.set_state(ProgressBar::SUCCESS);
+        }
+        else {loading_bar.set_state(ProgressBar::NORMAL);}
+        loading_bar.set_progress(progress);
+        loading_bar.render();
+
+        window.draw(loading_bar);
 
         window.display();
     }
